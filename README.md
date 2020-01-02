@@ -1,6 +1,6 @@
 # depression_data_analysis
 # 
-## The mr_analysis script consists of the 50 significant snps from the depression data with LD clumped, the mr results of the MDD with 1025, 1024 Id's and the Meta analysis on the mr results.   
+#### The mr_analysis script consists of the 50 significant snps from the depression data with LD clumped, the mr results of the MDD with 1025, 1024 Id's and the Meta analysis on the mr results.   
 # 
 ## mr analysis using : http://www.mrbase.org/
 ## meta analysis : https://bookdown.org/MathiasHarrer/Doing_Meta_Analysis_in_R/pool.html , https://www.rdocumentation.org/packages/meta/versions/4.9-6/topics/metagen
