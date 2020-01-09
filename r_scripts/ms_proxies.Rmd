@@ -1,0 +1,253 @@
+---
+title: "MS proxies"
+output: html_notebook
+---
+```{r}
+# MS_cleaned data proxies
+rs3748817<- get_proxies(chrom = "1", pos = 2594226, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs3748817")
+
+rs12087340<- get_proxies(chrom = "1", pos = 85281310, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs12087340")
+
+rs41286801<- get_proxies(chrom = "1", pos = 92509907, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs41286801")
+
+rs6677309<- get_proxies(chrom = "1", pos = 116537544, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs6677309")
+
+rs1323292<- get_proxies(chrom = "1", pos = 192571891, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs1323292")
+
+rs55838263<- get_proxies(chrom = "1", pos = 200905600, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs55838263")
+#--------6
+rs842639<- get_proxies(chrom = "2", pos = 60868110, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs842639")
+
+rs9967792<- get_proxies(chrom = "2", pos = 191109709, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs9967792")
+
+rs13426106<- get_proxies(chrom = "2", pos = 230248784, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs13426106")
+
+rs1813375<- get_proxies(chrom = "3", pos = 28037080, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs1813375")
+
+rs57271503<- get_proxies(chrom = "3", pos = 119525746, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs57271503")
+
+rs1920296<- get_proxies(chrom = "3", pos = 121824730, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs1920296")
+#-----------12
+rs2255214<- get_proxies(chrom = "3", pos = 122051692, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs2255214")
+
+rs1014486<- get_proxies(chrom = "3", pos = 159973324, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs1014486")
+
+rs6881706<- get_proxies(chrom = "5", pos = 35879054, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs6881706")
+
+rs6880778<- get_proxies(chrom = "5", pos = 40398994, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs6880778")
+
+rs71624119<- get_proxies(chrom = "5", pos = 56144903, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs71624119")
+
+rs4976646<- get_proxies(chrom = "5", pos = 177361569, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs4976646")
+#-----------18
+rs6902687<- get_proxies(chrom = "6", pos = 28445714, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs6902687")
+
+rs2859355<- get_proxies(chrom = "6", pos = 28493444, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs2859355")
+
+rs2296340<- get_proxies(chrom = "6", pos = 33662695, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs2296340")
+
+rs941816<- get_proxies(chrom = "6", pos = 36407527, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs941816")
+
+rs11154801<- get_proxies(chrom = "6", pos = 135418217, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs11154801")
+
+rs17066096<- get_proxies(chrom = "6", pos = 137131771, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs17066096")
+#-----------24
+rs212407<- get_proxies(chrom = "6", pos = 159049385, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs212407")
+
+rs706015<- get_proxies(chrom = "7", pos = 26975369, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs706015")
+
+rs917116<- get_proxies(chrom = "7", pos = 28133120, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs917116")
+
+rs60600003<- get_proxies(chrom = "7", pos = 37342861, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs60600003")
+
+rs1021156<- get_proxies(chrom = "8", pos = 78663569, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs1021156")
+
+rs2456449<- get_proxies(chrom = "8", pos = 127180736, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs2456449")
+#------------30
+rs4410871<- get_proxies(chrom = "8", pos = 127802783, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs4410871")
+
+rs2104286<- get_proxies(chrom = "10", pos = 6057082, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs2104286")
+
+rs62626326<- get_proxies(chrom = "10", pos = 6079323, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs62626326")
+
+rs56382813<- get_proxies(chrom = "10", pos = 6082294, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs56382813")
+
+rs7923837<- get_proxies(chrom = "10", pos = 92722160, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs7923837")
+
+rs34383631<- get_proxies(chrom = "11", pos = 61025858, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs34383631")
+#---------- 36
+rs4944958<- get_proxies(chrom = "11", pos = 71457027, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs4944958")
+
+rs10892299<- get_proxies(chrom = "11", pos = 118856134, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs10892299")
+
+rs1800693<- get_proxies(chrom = "12", pos = 6330843, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs1800693")
+
+rs2364482<- get_proxies(chrom = "12", pos = 6392965, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs2364482")
+
+rs11052877<- get_proxies(chrom = "12", pos = 9753094, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs11052877")
+
+rs11172342<- get_proxies(chrom = "12", pos = 57793975, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs11172342")
+#--------- 42
+rs74796499<- get_proxies(chrom = "14", pos = 87965984, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs74796499")
+
+rs12927355<- get_proxies(chrom = "16", pos = 11100914, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs12927355")
+
+rs1974882<- get_proxies(chrom = "16", pos = 11352623, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs1974882")
+
+rs11865086<- get_proxies(chrom = "16", pos = 30119172, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs11865086")
+
+rs4796791<- get_proxies(chrom = "17", pos = 42378745, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs4796791")
+
+rs8070345<- get_proxies(chrom = "17", pos = 59739396, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs8070345")
+#----------48
+rs1077667<- get_proxies(chrom = "19", pos = 6668961, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs1077667")
+
+rs2288904<- get_proxies(chrom = "19", pos = 10631494, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs2288904")
+
+rs1870071<- get_proxies(chrom = "19", pos = 16394295, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs1870071")
+
+rs11554159<- get_proxies(chrom = "19", pos = 18175134, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs11554159")
+#-------52
+```
+
+```{r}
+## combine proxysnsps for MS_cleaned into a single dataframe
+proxy_ms <- rbind(rs3748817,  rs12087340, rs41286801 ,rs6677309 , rs1323292  ,rs55838263, rs842639  , rs9967792, 
+                  rs13426106, rs1813375,  rs57271503, rs1920296,  rs2255214,  rs1014486,  rs6881706 , rs6880778,
+                  rs71624119 ,rs4976646,  rs6902687 ,rs2859355 , rs2296340 , rs941816  , rs11154801 ,rs17066096,
+                  rs212407   ,rs706015  , rs917116   ,rs60600003, rs1021156 , rs2456449 , rs4410871 , rs2104286 ,
+                  rs62626326 ,rs56382813 ,rs7923837  ,rs34383631, rs4944958 , rs10892299, rs1800693 , rs2364482 ,
+                  rs11052877 ,rs11172342, rs74796499 ,rs12927355, rs1974882  ,rs11865086 ,rs4796791 , rs8070345 ,
+                  rs1077667  ,rs2288904  ,rs1870071  ,rs11554159)
+dim(proxy_ms)
+write.csv(proxy_ms, file = 'proxysnps_ms.csv')
+```
+
+
+```{r}
+
+# Number of SNPS from (A) that were not present in (B) but had a proxy in (B)
+proxysnps_ms_cleaned <- read.csv('proxysnps.csv') %>% as_tibble() %>% rename(SNP=ID)
+snp_sig_mdd_proxy <- inner_join(snp_sig_mdd, proxysnps_ms_cleaned, by = 'SNP')
+class(proxysnps_ms_cleaned$SNP)
+class(snp_sig_mdd_proxy$SNP)
+proxysnps_ms_cleaned$SNP <-  as.character(proxysnps_ms_cleaned$SNP)
+
+# Number of SNPS from (A) that were not present in (C) but had a proxy in (C)
+proxysnps_mdd_cleaned <- read.csv("proxysnpps_mdd.csv") %>% rename(SNP=ID)
+class(proxysnps_mdd_cleaned$SNP)
+proxysnps_mdd_cleaned$SNP <-  as.character(proxysnps_mdd_cleaned$SNP)
+snp_sig_mdd_proxymdd <- inner_join(snp_sig_mdd, proxysnps_mdd_cleaned, by = "SNP")
+
+# The mean r2 for proxies
+class(proxysnps_ms_cleaned$R.squared)
+is.na(proxysnps_ms_cleaned) <- sapply(proxysnps_ms_cleaned, is.infinite)
+mean(proxysnps_ms_cleaned$R.squared, na.rm = T)
+```
+
+
+

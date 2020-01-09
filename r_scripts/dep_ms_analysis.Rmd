@@ -1,0 +1,191 @@
+---
+title: "Depression and MS analysis"
+author: "Mitul Patel, Mitulkumar.Patel@umanitoba.ca"
+output: html_notebook
+---
+
+```{r R packages, warning=FALSE, message=FALSE}
+library(devtools)
+library(TwoSampleMR)
+library(MRInstruments)
+library(dplyr)
+library(tidyr)
+library(data.table)
+library(ggplot2)
+library(proxysnps)
+library(readtext)
+library(stringr)
+```
+
+```{r }
+# packages installed
+install.packages("devtools")
+install_github("MRCIEU/TwoSampleMR")
+install_github('MarkEdmondson1234/googleAuthR@v0.8.1')
+devtools::install_github("MRCIEU/MRInstruments")
+devtools::install_github("slowkow/proxysnps", force = TRUE)
+```
+
+
+```{r}
+# read depression and MS data
+MDD <- fread('data/PGC_UKB_depression_genome-wide.fix.tsv', sep = '\t', header = TRUE) %>% as_tibble()%>%
+  rename(effect_allele = A1, other_allele = A2, eaf = Freq, se = StdErrLogOR, pval = P, SNP = MarkerName)
+write.csv(MDD, file="MDD.csv")
+head(MDD)
+```
+
+```{r}
+# read the ms data and renaming some of the columns. 
+ms <- fread('GCST005531-independently-associated-loci.tsv', sep='\t', header= TRUE) %>% as_tibble() %>% rename(SNP = rsID)
+ms_cleaned <- separate(ms, 'Lead Variant', into=c("chr","pos","A1","A2"), sep = "_")
+```
+
+```{r}
+# read the 1k data and combine with ms_cleaned
+# add in allele frequency from 1kg (1000Genomes)
+af <- fread("1kg.polymorphic.SNPs.hg19.tsv") %>%
+  as_tibble() %>%
+  select(ID,CHROM,POS,REF,ALT,EUR_AF) %>%
+  rename(chr=CHROM,pos=POS) %>%
+  filter(chr != "X") %>% # remove X chromosome SNPs
+  filter(chr != "Y") # remove Y chromosome SNPs
+
+af$chr <- as.integer(af$chr) #change data type
+ms_cleaned$chr <- as.integer(ms_cleaned$chr) #change data type
+ms_cleaned$pos <- as.integer(ms_cleaned$pos)
+colnames(ms_cleaned)
+colnames(af)
+class(af$pos)
+class(ms_cleaned$pos)
+ms_1k <- left_join(ms_cleaned, af, by = c("chr", "pos"))
+
+ms_combined_1k <- ms_1k %>%
+  filter(!is.na(ID)) %>% # remove any that dont match w 1KG allele frequencies
+  arrange(ID) %>% # remove duplicates
+  group_by(ID) %>% 
+  slice(1)
+```
+
+```{r}
+# WTCCC2 data
+wtccc2 <- fread('GCST001198-independently-associated-loci.tsv', sep='\t', header=TRUE) %>% as_tibble() 
+wtccc2 <- separate(wtccc2, "Lead Variant", into=c("chr","pos","A1","A2"), sep="_")
+```
+
+
+
+```{r}
+## (C) Number of SNPs from (A) that are also included in the IMSGC WTCCC2 study (i.e MS study)
+snp_sig_ms <- inner_join(snp_sig_mdd, ms_cleaned, by="SNP")
+dim(snp_sig_ms)
+## None of the 6 SNPs from MDD are included in the MS.
+```
+ 
+
+```{r}
+# double check 
+snp_sig_mdd %>% filter(SNP == 'rs4941810') 
+ms_cleaned %>% filter(SNP == 'rs4941810')
+```
+
+
+```{r}
+# obtain SNP's that are GWAS significant for the exposure.
+dep_exp <- format_data(dep, type='exposure')
+write.csv(dep_, file = "exposure_GWS.csv")
+head(dep_exp)
+```
+
+```{r} 
+# check if there is an overlap between the SNPs in mdd2018 data.
+
+mdd2018 <- fread('MDD2018_ex23andMe ', header = T)
+snp_sig_mdd2018 <- inner_join(snp_sig_mdd, mdd2018, by="SNP")
+dim(snp_sig_mdd2018)
+
+```
+
+
+```{r}
+# new MS data: split into 2 - one with all the rsID's and the other with chrXX:xxxx. 
+MS_1 <- read.csv("MS1.csv") %>% as_tibble() %>% rename(chr=CHR,pos=BP)
+#sub <- MS_1[1:100,] # subset to experiment
+MS_1$character <- (str_extract(MS_1$SNP, "[aA-zZ]+")) # extract strings from number
+MS_1_rs <- subset(MS_1, character == "rs") #data with all the rsIDs
+MS_1_chr <- subset(MS_1, character == "chr") %>% rename(chrXX=SNP)# data with all the chrXX:xxx..
+genomes_1kg <- read.csv("1k_genomes.csv") %>% as_tibble()
+
+# combine MS data (i.e ones that has chrXX:xxx) with the 1kg data by BP & pos
+MS_chr_1kg <- inner_join(genomes_1kg, MS_1_chr, by=c("chr","pos")) %>% rename(SNP=ID)
+write.csv(MS_chr_1kg, file="partialMS_joined_1kg.csv")
+
+#SNPs overlap between MS data that had rsIDs in it and the MDD 
+MS1_rs_MDD_sigsnps <- inner_join(snp_sig_mdd, MS_1_rs, by = c("SNP")) 
+MS1_chr_MDD_sigsnps <-inner_join(snp_sig_mdd, MS_chr_1kg, by = c("SNP"))
+dim(MS1_chr_MDD_sigsnps)
+```
+
+
+```{r}
+# Trying out different things: ignore this part of the code 
+ #MS_1 <- separate(MS_1, "SNP", into=c("chr1","chr1_split"), sep=":") 
+ #MS_1$chr1 <- replace(MS_1$chr1, 'chr1', 'chr')
+ #sub$character <-  gsub("[[:digit:]]","", sub$SNP) #alternate way and it works
+ #sub$number <- gsub("[[:digit:]]","",sub$SNP) #dont quite work
+#ms22$number <- (str_extract(ms22$SNP,"[0-9]+")) # dont quite work
+#ms33$character <- (str_extract(ms33$SNP, "[aA-zZ]+")) # works in extracting the str from the number
+#sub <- subset(MS1_cleaned, character == "chr")
+#sub$SNP <- as.character(sub$SNP)
+#sub <- separate(sub, "SNP", into = c("char","num"), sep=":")
+#write.csv(sub, file="copyofms1_cleaned_testing.csv")
+```
+```{r}
+MS_2 <- read.table("ImmunoChip_Results/Immunochip_FinalResults_LimitedDiscovery.txt",  header = T, sep='',stringsAsFactors = F) 
+write.csv(MS_2, file='MS_2.csv')
+MS_2$character <- (str_extract(MS_2$ImmunochipID, "[aA-zZ]+")) # extract strings from number
+MS_2_rs <- subset(MS_2, character == "rs") %>% rename(SNP=ImmunochipID) #data with all the rsIDs
+MS_2_vh <- subset(MS_1, character == "vh_") %>% rename(chrXX=SNP)# data with all the chrXX:xxx..
+
+# combine MS data (i.e ones that has chrXX:xxx) with the 1kg data by BP & pos
+#MS_chr_1kg <- inner_join(genomes_1kg, MS_2_chr, by=c("chr","pos")) %>% rename(SNP=ID)
+#write.csv(MS_chr_1kg, file="partialMS_joined_1kg.csv")
+
+#SNPs overlap between MS data that had rsIDs in it and the MDD 
+MS2_rs_MDD_sigsnps <- inner_join(snp_sig_mdd, MS_2_rs, by = c("SNP")) 
+#MS1_chr_MDD_sigsnps <-inner_join(snp_sig_mdd, MS_chr_1kg, by = c("SNP"))
+dim(MS2_rs_MDD_sigsnps)
+```
+
+
+```{r}
+# new code 20th dec
+mdd <- fread("data/PGC_UKB_depression_genome-wide.fix.tsv") %>%
+  as_tibble() %>%
+  filter(P <= 5e-08) %>%
+  rename(SNP=MarkerName,
+         pval.exposure=P)
+mdd <- clump_data(mdd)
+
+mdd_ms1rs_snpssig <- inner_join(mdd, MS_1_rs, by="SNP")
+mdd_ms1chr1kg_snpssig <- inner_join(mdd, MS_chr_1kg, by="SNP")
+mdd_ms1_snps <- full_join(mdd_ms1rs_snpssig,mdd_ms1chr1kg_snpssig)
+
+outcome_dat <- read_outcome_data(
+    snps = mdd_ms1_snps$SNP,
+    filename = "MDD.csv",
+    sep = ",",
+    snp_col = "SNP",
+    beta_col = "LogOR",
+    #se_col = "SE",
+    effect_allele_col = "A1",
+    other_allele_col = "A2",
+    eaf_col = "Freq",
+    pval_col = "pval.exposure"
+    #units_col = "Units",
+    #gene_col = "Gene",
+    #samplesize_col = "n"
+)
+```
+
+

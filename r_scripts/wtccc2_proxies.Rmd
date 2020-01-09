@@ -1,0 +1,113 @@
+---
+title: "WTCCC2 proxies"
+output: html_notebook
+---
+
+```{r}
+ #  get the proxysnps for the wtccc2 and then compare with snp_sig_mdd
+# WTCCC2 data proxies
+rs4648356<- get_proxies(chrom = "1", pos = 2792599, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs4648356")
+
+rs12746893<- get_proxies(chrom = "1", pos = 92745319, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs12746893")
+
+rs11581062<- get_proxies(chrom = "1", pos = 100941963, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs11581062")
+
+rs1335532<- get_proxies(chrom = "1", pos = 116558335, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs1335532")
+
+rs11129295<- get_proxies(chrom = "3", pos = 27747289, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs11129295")
+
+rs669607<- get_proxies(chrom = "3", pos = 28029953, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs669607")
+--------6
+rs771767<- get_proxies(chrom = "3", pos = 102029794, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs771767")
+
+rs2293370<- get_proxies(chrom = "3", pos = 119501087, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs2293370")
+
+rs9282641<- get_proxies(chrom = "3", pos = 122077921, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs9282641")
+
+rs4613763<- get_proxies(chrom = "3", pos = 40392626, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs4613763")
+
+rs1029328<- get_proxies(chrom = "5", pos = 28480138, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs1029328")
+
+rs394199<- get_proxies(chrom = "6", pos = 33585803, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs394199")
+-----------12
+  rs11154801<- get_proxies(chrom = "6", pos = 135418217, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs11154801")
+
+rs17066096<- get_proxies(chrom = "3", pos = 137131771, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs17066096")
+
+rs1738074<- get_proxies(chrom = "5", pos = 159044945, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs1738074")
+
+rs3118470<- get_proxies(chrom = "5", pos = 6059750, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs3118470")
+
+rs650258<- get_proxies(chrom = "5", pos = 61064810, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs650258")
+
+rs1800693<- get_proxies(chrom = "5", pos = 6330843, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs1800693")
+-------18
+ rs4902647<- get_proxies(chrom = "6", pos = 68787474, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs4902647")
+
+rs2119704<- get_proxies(chrom = "3", pos = 88021345, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs2119704")
+
+rs7200786<- get_proxies(chrom = "5", pos = 11083944, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs7200786")
+
+rs1077667<- get_proxies(chrom = "5", pos = 6668961, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs1077667")
+
+rs874628<- get_proxies(chrom = "5", pos = 18193890, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs874628")
+
+rs2248359<- get_proxies(chrom = "5", pos = 54174979, window = 250000, pop="EUR") %>%
+  filter(R.squared>0.8) %>%
+  mutate(leadSNP="rs2248359")
+```
+
+```{r}
+# combine proxysnsps for wtccc2 into a single dataframe
+proxy_mdd <- rbind(rs4648356,  rs12746893, rs11581062,rs1335532,rs11129295,rs669607,rs771767,rs2293370,rs9282641,rs4613763, 
+rs1029328,rs394199,rs11154801,rs17066096,rs1738074,rs3118470,rs650258,rs1800693,rs4902647,rs2119704,rs7200786,rs1077667,rs874628,rs2248359 )
+dim(proxy_mdd)
+
+write.csv(proxy_mdd, file = "proxysnpps_mdd.csv")
+```
