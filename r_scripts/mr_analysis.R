@@ -109,4 +109,3 @@ m_ <- metagen(exp.b,
                  comb.fixed = T,
                  comb.random = F,
                  data = mr_results) 
-m_IVW
