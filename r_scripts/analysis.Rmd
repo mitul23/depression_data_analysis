@@ -1,0 +1,108 @@
+---
+title: "Depression and MS analysis"
+output: html_notebook
+---
+
+
+```{r packages}
+library(devtools)
+library(TwoSampleMR)
+library(MRInstruments)
+library(dplyr)
+library(data.table)
+library(ggplot2)
+library(tidyr)
+library(proxysnps)
+```
+```{r packages installed}
+install.packages("devtools", dependencies = TRUE)
+install.packages("data.table", dependencies = TRUE)
+remotes::install_github("hadley/devtools")
+remotes::install_github('MRCIEU/TwoSampleMR')
+devtools::install_github("MRCIEU/MRInstruments")
+devtools::install_github('MarkEdmondson1234/googleAuthR@v0.8.1')
+devtools::install_github("slowkow/proxysnps")
+```
+
+# MDD data
+```{r MDD data}
+MDD <- fread('PGC_UKB_depression_genome-wide.fix.tsv', sep='\t', header = TRUE)%>% as_tibble()%>%
+  rename(effect_allele = A1, other_allele = A2, eaf = Freq, se = StdErrLogOR, pval= P, SNP = MarkerName)
+head(MDD)
+
+```
+
+# IMSGC immunochip data
+```{r IMSGC immunochip data}
+imsgc <- fread("data/GCST005531-independently-associated-loci.tsv", sep='\t', header = TRUE)
+imsgc <- separate(imsgc, "Lead Variant", into = c("chr","pos","A1","A2"), sep = "_")
+head(imsgc)
+```
+
+# IMSGC WTCCC2 data
+```{r IMSGC WTCCC2 data}
+wtccc2 <- fread("data/GCST001198-independently-associated-loci.tsv", sep='\t', header=TRUE)
+wtccc2 <- separate(wtccc2, "Lead Variant", into = c("chr","pos","A1","A2"), sep = "_")
+head(wtccc2)
+```
+
+# add in allele frequency from 1kg (1000Genomes) to imsgc immunochip data
+```{r}
+af <- fread("data/1kg.polymorphic.SNPs.hg19.tsv") %>%
+  as_tibble() %>%
+  select(ID,CHROM,POS,REF,ALT,EUR_AF) %>%
+  rename(chr=CHROM,
+         pos=POS) %>%
+  filter(chr != "X") %>% # remove X chromosome SNPs
+  filter(chr != "Y") # remove Y chromosome SNPs
+
+af$chr <- as.integer(af$chr)
+imsgc$chr <- as.integer(imsgc$chr)
+head(af)
+
+ms <- left_join(imsgc, af, by = c("rsID" = "ID"))
+#ms$A1 %in% ms$REF double checking if A1 == REF´
+ms <- ms %>%
+  filter(!is.na(rsID)) %>% # remove any that dont match w 1KG allele frequencies
+  arrange(rsID) %>% # remove duplicates
+  group_by(rsID) %>% 
+  slice(1)
+```
+
+```{r}
+# Extract SNPs from the data: steps -> exposure data; LD proxies
+#mdd_exp_dat <- format_data(MDD, type ="exposure")
+#head(mdd_exp_dat)
+#write.csv(mdd_exp_dat, file = "exposure_GWS_MDD.csv")
+#outcome_dat <- read_outcome_data(
+#  snps = mdd_exp_dat$SNP,
+#  filename = "ms.csv",
+#  snp_col = 'rsID',
+#  beta_col = 'Odds Ratio',
+#  eaf_col = 'EUR_AF',
+#  pval_col = 'P-value',
+#)
+```
+
+# SNP selection
+```{r}
+# (A) Number of SNPs that are GWA-sig (P<=5e-8) from MDD: 4625 obs.
+snp_sig <- MDD %>% filter(pval <= 5.0e-8) 
+head(snp_sig)
+```
+```{r}
+# (B) Number of SNPs from (A) that are also included in the IMSGC immunochip study: NONE
+mdd_immun_snps <- snp_sig %>% inner_join(imsgc, by = c('SNP' = 'rsID'), suffix = c('_MDD', '_imsgc'))
+head(mdd_immun_snps)
+```
+```{r}
+#double check (B)
+imsgc %>% filter(rsID == 'rs4941810')
+```
+```{r}
+# (B) Number of SNPs from (A) that are also included in the IMSGC WTCCC2 study: NONE
+mdd_wtccc2_snps <- snp_sig %>% inner_join(wtccc2, by = c('SNP' = 'rsID'), suffix = c('_MDD', '_imsgc'))
+head(mdd_immun_snps)
+```
+
+
