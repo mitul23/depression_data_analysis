@@ -1,0 +1,150 @@
+---
+title: "Exposure MDD on outcome MS"
+output: html_notebook
+author: Mitul Patel
+date: "`r format(Sys.time(), '%d %B %Y')`"
+
+---
+
+##### The package used for ***TwoSampleMR analysis***: [https://mrcieu.github.io/TwoSampleMR/]. Here we use TwoSampleMR (2SMR) to estimate the causal effect of an exposure (depression) on an outcome (MS). 
+**Steps to perform**:
+
+ 1. Select instruments for the exposure (i.e depression data with pval significant SNPs and LD clumped).
+ 2. Select outcome (i.e MS data)
+ 3. Harmonise the effect sizes for the instruments on the exposure and the outcomes to be each for the same reference allele. If different allele, the effect sizes can be seem to have a negative sign. 
+ 4. Perform MR analysis
+ 
+### Exposure
+```{r}
+library(TwoSampleMR)
+library(dplyr)
+library(data.table)
+library(tidyr)
+library(proxysnps)
+
+# Minimum information needed in the instruments for an exposure: SNP, beta (logOR for binary case: logOR == beta == logEffectSize), se, eaf, effect_allele, and other_allele. The depression dataset is already LD clumped using clump_data(). LD clump ensures that the instruments for the exposure are independent. The following are the 50 significant SNPs from the full_MDD dataset. (add the size of the original data and the source of the data)
+
+depression_dat <- fread("../data/PGC_UKB_depression_genome-wide.fix.LDclumped.tsv",sep='\t', header = TRUE) %>% as_tibble() %>% rename(beta = LogOR, se = StdErrLogOR, effect_allele = A1, other_allele = A2, pval = pval.exposure, eaf = Freq) %>% mutate(exposure = "depression")
+depression_dat<- format_data(depression_dat, type ="exposure") # to get the data in the format that MRBase accepts 
+dim(depression_dat)
+head(depression_dat)
+write.csv(depression_dat,"../data/MDD_20200113.csv")
+```
+
+### Outcome
+```{r}
+# Extract the depression SNPs from the MS: found 49 (add the source of the data)
+ms_dat <- fread("../data/MS_data2020.csv") %>% as_tibble() 
+dim(ms_dat)
+head(ms_dat)
+dep_ms_snps <- inner_join(depression_dat, ms_dat, by=c("SNP"="ID"))
+dim(dep_ms_snps)
+head(dep_ms_snps)
+```
+
+```{r}
+# Of the 50 SNPs in the exposure data, only 49 SNPs were present in the ms data. The remaining 1 snp can be found via LD proxies.
+SNPs_not_persent <- subset(depression_dat, !(SNP %in% dep_ms_snps$SNP))
+head(SNPs_not_persent)
+```
+```{r}
+# Alternate option to extract the depression SNPs from MS using the function from MRBase: found 49 again (verifies above results!)
+outcome_dat <- read_outcome_data(
+  depression_dat$SNP,
+  filename = "../data/MS_data2020.csv",
+  sep=",",
+  snp_col = "ID",
+  beta_col = "beta",
+  se_col = "logStandardError",
+  effect_allele_col = "A1",
+  other_allele_col = "A2",
+  eaf_col = "A1_Freq",
+  pval_col = "P"
+)
+dim(outcome_dat)
+head(outcome_dat)
+```
+```{r}
+# The LD proxies of the 1 SNP. 
+rs6699744 <- get_proxies(chrom = "1", pos = 72825144, window = 250000, pop="EUR") %>% filter(R.squared>0.8) %>% mutate(leadSNP="rs6699744")
+
+# In total 45 proxies were found. Here we select a proxy that has the smalles p-val in P column and is stored in the "20200114_mdd_ms_proxies.csv" file. 
+proxy_sig <- fread("../data/20200114_mdd_ms_proxies.csv", header = T) %>% 
+  as_tibble() %>% 
+  select(leadSNP, A1, A2, A1_Freq, beta, logStandardError, P, proxySNP) %>% # keeping the relevant cols
+  rename(SNP=leadSNP,effect_allele=A1, other_allele=A2, Freq=A1_Freq, se=logStandardError, pval=P, beta = beta) # rename so its inline with the other 45 SNPs data
+head(proxy_sig)
+
+proxy_sig <- format_data(proxy_sig, type="outcome", snps = NULL, header = T, snp_col = "SNP", beta_col = "beta", se_col = "se", effect_allele_col = "effect_allele", other_allele_col = "other_allele", pval_col = "pval",eaf_col = "Freq") # get the data in the right format for MRBase
+proxy_sig$id.outcome <- outcome_dat$id.outcome[1]
+proxy_sig <- proxy_sig %>% mutate(data_source.outcome = 'textfile') # so the both datasets have right number of cols
+
+# change the effect and other alleles of the proxies to that of the orignal MDD data. 
+proxy_sig[3,]$other_allele.outcome <- "T"
+
+#  merging 45 SNPs with the 5 LD proxies
+proxysig_dep_dat <- rbind(proxy_sig[3,], outcome_dat) 
+dim(proxysig_dep_dat)
+```
+
+
+### Harmonise
+```{r}
+# without the 1 proxied SNPs: 49 SNPs
+harmonise_49snps_dat <- harmonise_data(exposure_dat = depression_dat,
+                      outcome_dat = outcome_dat)
+dim(harmonise_49snps_dat)
+head(harmonise_49snps_dat)
+```
+```{r}
+# with the 1 proxied SNPs: 50 SNPs
+harmonise_dat <- harmonise_data(exposure_dat = depression_dat,
+                      outcome_dat = proxysig_dep_dat)
+dim(harmonise_dat)
+head(harmonise_dat)
+```
+
+### MR
+```{r}
+res <- mr(harmonise_dat, method_list = c("mr_egger_regression", "mr_ivw"))
+write.csv(res,"../results/20200114_mr_expMDD_outMS.csv")
+res
+```
+
+### Sensitivity analysis : Heterogeneity stats
+```{r}
+mr_heterogeneity(harmonise_dat, method_list=c("mr_egger_regression", "mr_ivw"))
+mr_pleiotropy_test(harmonise_dat) # Horizontal pleiotropy: intercept term
+```
+
+### Leave-one-out
+```{r}
+res_loo <- mr_leaveoneout(harmonise_dat) # identify which SNP(s) is driving the association.
+dim(res_loo)
+```
+
+### Plots
+```{r}
+res <- mr(harmonise_dat, method_list = c("mr_egger_regression","mr_ivw"))
+
+# scatter plot
+p1 <- mr_scatter_plot(res,harmonise_dat) # IVW line is the standard MR analysis, and the MR Egger is the pleiotropy-adjusted MR-Egger regression line. The estimated MR-Egger intercept term was 0.01.
+p1[[1]]
+#ggsave(p1[[1]], file="../results/scatter plot.pdf", width=7, height=7)
+
+# forest plot
+res_single <- mr_singlesnp(harmonise_dat, all_method=c("mr_ivw", "mr_two_sample_ml")) #
+p2 <- mr_forest_plot(res_single)
+p2[[1]]
+
+# leave-one-out
+res_loo <- mr_leaveoneout(harmonise_dat)
+p3 <- mr_leaveoneout_plot(res_loo)
+p3[[1]]
+
+# funnel plot
+res_single <- mr_singlesnp(harmonise_dat)
+p4 <- mr_funnel_plot(res_single)
+p4[[1]]
+```
+
